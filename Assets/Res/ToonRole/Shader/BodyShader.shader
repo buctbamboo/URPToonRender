@@ -79,7 +79,7 @@ Shader "LearnUnlit/BodyShader"
         {
             Name "Outline"
             Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-            Cull Front
+            Cull Back
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -90,7 +90,6 @@ Shader "LearnUnlit/BodyShader"
             struct Atributes
             {
                 float4 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
                 float3 normalOS : NORMAL;
                 float4 tangentOS  : TANGENT;
             };
@@ -99,15 +98,6 @@ Shader "LearnUnlit/BodyShader"
             {
                 float4 positionCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
-
-                //世界空间顶点
-				float3 positionWS :  TEXCOORD1;
-				//世界空间法线
-				float3 normalWS : TEXCOORD2;
-				//世界空间切线
-				float3 tangentWS : TEXCOORD3;
-				//世界空间副切线
-				float3 bitangentWS : TEXCOORD4;
             };
 
             CBUFFER_START(UnityPerMaterial)
@@ -115,18 +105,17 @@ Shader "LearnUnlit/BodyShader"
                 float _Outline;
             CBUFFER_END
 
-            Varyings vert(Atributes v)
+            Varyings vert(Atributes input)
             {
                 Varyings o = (Varyings)0;
-                o.positionCS = TransformObjectToHClip(v.positionOS);
-                
-                VertexNormalInputs normalInputs = GetVertexNormalInputs(v.normalOS.xyz,v.tangentOS);
+                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS);
+                VertexNormalInputs normalInputs = GetVertexNormalInputs(input.normalOS, input.tangentOS);
+                float3 positionWS = vertexInput.positionWS;
 
-                o.normalWS = normalInputs.normalWS;
-                o.tangentWS = normalInputs.tangentWS;
-                o.bitangentWS = normalInputs.bitangentWS;
 
-                o.positionCS.xy += o.normalWS.xy * _Outline * 1;
+                positionWS += normalInputs.normalWS * _Outline * 1;
+
+                o.positionCS = TransformObjectToHClip(positionWS);
                return o;
            }
 
