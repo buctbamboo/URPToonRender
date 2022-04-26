@@ -13,9 +13,9 @@ Shader "LearnUnlit/BodyShader"
     {
         Pass
         {
-            Name "ForwardLit"
-            Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-            Cull Front
+            Name "UniversalForward"
+            Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline" "LightMode" = "UniversalForward"}
+            Cull Back
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -77,9 +77,9 @@ Shader "LearnUnlit/BodyShader"
 
         Pass
         {
-            Name "Outline"
-            Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-            Cull Back
+            Name "SRPDefaultUnlit"
+            Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline" "LightMode" = "SRPDefaultUnlit"}
+            Cull Front
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -113,7 +113,7 @@ Shader "LearnUnlit/BodyShader"
                 float3 positionWS = vertexInput.positionWS;
 
 
-                positionWS += normalInputs.normalWS * _Outline * 1;
+                positionWS += normalInputs.normalWS * _Outline * 0.1;
 
                 o.positionCS = TransformWorldToHClip(positionWS);
                return o;
