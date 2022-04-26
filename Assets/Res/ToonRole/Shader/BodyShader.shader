@@ -15,7 +15,7 @@ Shader "LearnUnlit/BodyShader"
         {
             Name "ForwardLit"
             Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-            Cull Back
+            Cull Front
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -115,7 +115,7 @@ Shader "LearnUnlit/BodyShader"
 
                 positionWS += normalInputs.normalWS * _Outline * 1;
 
-                o.positionCS = TransformObjectToHClip(positionWS);
+                o.positionCS = TransformWorldToHClip(positionWS);
                return o;
            }
 
