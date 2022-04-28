@@ -6,6 +6,13 @@ Shader "URPToon/URPToonShader"
         [MainTexture]_BaseMap("_BaseMap (Albedo)", 2D) = "white" {}
         [HDR][MainColor]_BaseColor("_BaseColor", Color) = (1,1,1,1)
 
+        [Header(Emission)]
+        [Toggle]_UseEmission("_UseEmission (on/off Emission completely)", Float) = 0
+        [HDR] _EmissionColor("_EmissionColor", Color) = (0,0,0)
+        _EmissionMulByBaseColor("_EmissionMulByBaseColor", Range(0,1)) = 0
+        [NoScaleOffset]_EmissionMap("_EmissionMap", 2D) = "white" {}
+        _EmissionMapChannelMask("_EmissionMapChannelMask", Vector) = (1,1,1,0)
+
         [Header(Outline)]
         _OutlineWidth("_OutlineWidth (World Space)", Range(0,1)) = 1
         _OutlineColor("_OutlineColor", Color) = (0.5,0.5,0.5,1)

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: URPToonMat
+  m_Name: URPToonHeadMat
   m_Shader: {fileID: 4800000, guid: 06a44315ffbd21c43863973dcef7512c, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -94,7 +94,7 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _OutlineWidth: 0.042
+    - _OutlineWidth: 0.375
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
