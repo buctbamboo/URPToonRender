@@ -39,16 +39,43 @@ struct ToonLightingData
 };
 
 sampler2D _BaseMap;
+sampler2D _EmissionMap;
+sampler2D _OcclusionMap;
 
 CBUFFER_START(UnityPerMaterial)
     // base color
     float4  _BaseMap_ST;
     half4   _BaseColor;
 
+    // emission
+    float   _UseEmission;
+    half3   _EmissionColor;
+    half    _EmissionMulByBaseColor;
+    half3   _EmissionMapChannelMask;
+
+    // occlusion
+    float   _UseOcclusion;
+    half    _OcclusionStrength;
+    half4   _OcclusionMapChannelMask;
+    half    _OcclusionRemapStart;
+    half    _OcclusionRemapEnd;
+
+    // lighting
+    half3   _IndirectLightMinColor;
+    half    _CelShadeMidPoint;
+    half    _CelShadeSoftness;
+
+    // shadow mapping
+    half    _ReceiveShadowMappingAmount;
+    float   _ReceiveShadowMappingPosOffset;
+    half3   _ShadowMapColor;
+
     // outline
     float   _OutlineWidth;
-    half4   _OutlineColor;
+    half3   _OutlineColor;
 CBUFFER_END
+
+#include "ToonRenderCommonLight.hlsl"
 
 /* Outline Function */
 float3 TransformPositionWSToOutlinePositionWS(float3 positionWS, float positionVS_Z, float3 normalWS)
@@ -57,7 +84,7 @@ float3 TransformPositionWSToOutlinePositionWS(float3 positionWS, float positionV
     return positionWS + normalWS * outlineExpandAmount; 
 }
 
-half4 ConvertSurfaceColorToOutlineColor(half4 originalSurfaceColor)
+half3 ConvertSurfaceColorToOutlineColor(half3 originalSurfaceColor)
 {
     return originalSurfaceColor * _OutlineColor;
 }
@@ -136,10 +163,10 @@ ToonSurfaceData InitializeSurfaceData(Varyings input)
     DoClipTestToTargetAlphaValue(output.alpha);// early exit if possible
 
     // emission
-    output.emission = GetFinalEmissionColor(input);
+    output.emission = 0;//GetFinalEmissionColor(input);
 
     // occlusion
-    output.occlusion = GetFinalOcculsion(input);
+    output.occlusion = 0;//GetFinalOcculsion(input);
 
     return output;
 }
@@ -154,13 +181,36 @@ ToonLightingData InitializeLightingData(Varyings input)
     return lightingData;
 }
 
+half3 ShadeAllLights(ToonSurfaceData surfaceData, ToonLightingData lightingData)
+{
+    half3 indirectResult = ShadeGI(surfaceData, lightingData);
+
+    Light mainLight = GetMainLight();
+    //float3 shadowTestPosWS = lightingData.positionWS + mainLight.direction * (_ReceiveShadowMappingPosOffset + _IsFace);
+
+    // Main light
+    half3 mainLightResult = ShadeSingleLight(surfaceData, lightingData, mainLight, false);
+
+    // additional lights
+    half3 additionalLightSumResult = 0;
+    
+    // emission
+    half3 emissionResult = 0;
+
+    return CompositeAllLightResults(indirectResult, mainLightResult, additionalLightSumResult, emissionResult, surfaceData, lightingData);
+}
+
 half4 FragShaderColor(Varyings input) : SV_TARGET
 {
-    half4 baseColor = GetFinalBaseColor(input);
+    ToonSurfaceData surfaceData = InitializeSurfaceData(input);
+
+    ToonLightingData lightingData = InitializeLightingData(input);
+
+    half3 color = ShadeAllLights(surfaceData, lightingData);
 
 #ifdef ToonShaderIsOutline
-    baseColor = ConvertSurfaceColorToOutlineColor(baseColor);
+    color = ConvertSurfaceColorToOutlineColor(color);
 #endif
 
-    return baseColor;
+    return half4(color, surfaceData.alpha);
 }

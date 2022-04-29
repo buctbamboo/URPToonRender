@@ -13,6 +13,20 @@ Shader "URPToon/URPToonShader"
         [NoScaleOffset]_EmissionMap("_EmissionMap", 2D) = "white" {}
         _EmissionMapChannelMask("_EmissionMapChannelMask", Vector) = (1,1,1,0)
 
+        [Header(Lighting)]
+        _IndirectLightMinColor("_IndirectLightMinColor", Color) = (0.1,0.1,0.1,1) // can prevent completely black if lightprobe not baked
+        _IndirectLightMultiplier("_IndirectLightMultiplier", Range(0,1)) = 1
+        _DirectLightMultiplier("_DirectLightMultiplier", Range(0,1)) = 1
+        _CelShadeMidPoint("_CelShadeMidPoint", Range(-1,1)) = -0.5
+        _CelShadeSoftness("_CelShadeSoftness", Range(0,1)) = 0.05
+        _MainLightIgnoreCelShade("_MainLightIgnoreCelShade", Range(0,1)) = 0
+        _AdditionalLightIgnoreCelShade("_AdditionalLightIgnoreCelShade", Range(0,1)) = 0.9
+
+        [Header(Shadow mapping)]
+        _ReceiveShadowMappingAmount("_ReceiveShadowMappingAmount", Range(0,1)) = 0.65
+        _ReceiveShadowMappingPosOffset("_ReceiveShadowMappingPosOffset", Float) = 0
+        _ShadowMapColor("_ShadowMapColor", Color) = (1,0.825,0.78)
+
         [Header(Outline)]
         _OutlineWidth("_OutlineWidth (World Space)", Range(0,1)) = 1
         _OutlineColor("_OutlineColor", Color) = (0.5,0.5,0.5,1)
